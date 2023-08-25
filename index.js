@@ -2,7 +2,7 @@ const express = require("express"); //
 const app = express();
 const port = 5000;
 const cors = require("cors");
-const movieRoutes = require("./src/routers/userRouter");
+const userRouter = require("./src/routers/userRouter");
 require("dotenv").config();
 app.use(cors({}));
 
@@ -17,7 +17,7 @@ app.use(express.urlencoded({ extended: false })); //อาจจะไม่ต�
 //   res.send("hello world");
 // });
 
-app.use("/api/v1/user", movieRoutes);
+app.use("/api/v1/user", userRouter);
 
 // app.get('/', (req, res) => {
 //  res.send("HI HI HI")

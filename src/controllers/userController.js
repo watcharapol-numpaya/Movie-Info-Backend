@@ -1,18 +1,93 @@
 const pool = require("../../db");
+const queries = require("../queries/queries");
 
-const getUsers = async (req, res) => {
-  await pool.query("SELECT * FROM users", (err, result) => {
+const getUser = async (req, res) => {
+  await pool.query(queries.getUser, (err, results) => {
     if (err) {
       console.log(err);
     } else {
-      res.send(result);
+      //   res.send(results);
+      res.status(200).send(results.rows);
     }
   });
-  // res.send(pool)
 };
 
-const getFavoriteMovie = () => {};
+const getUserById = async (req, res) => {
+  const userId = req.params.userId;
+  //   res.send(userId);
+  await pool.query(queries.getUserById, [userId], (err, results) => {
+    if (err) {
+      console.log(err);
+    } else {
+      res.status(200).send(results.rows);
+    }
+  });
+};
+
+const getFavoriteMovie = async (req, res) => {
+  const userId = req.params.userId;
+  await pool.query(queries.getFavoriteMovie, [userId], (err, results) => {
+    if (err) {
+      console.log(err);
+    } else {
+      res.status(200).send(results.rows);
+    }
+  });
+};
+
+const addNewUser = async (req, res) => {
+  const username = req.body.username;
+  const password = req.body.password;
+  await pool.query(queries.addNewUser, [username, password], (err, res) => {
+    if (err) {
+      console.log(err);
+    } else {
+      res.send("Value insert");
+    }
+  });
+};
+
+const removeUser = async (req, res) => {
+  const userId = req.body.userId;
+  await pool.query(queries.removeUser, [userId], (err, res) => {
+    if (err) {
+      console.log(err);
+    } else {
+      res.send("remove complete");
+    }
+  });
+};
+
+const addFavoriteMovie = async (req, res) => {
+  const userId = req.body.userId;
+  const favoriteMovie = req.body.favoriteMovie;
+  await pool.query(queries.removeUser, [favoriteMovie, userId], (err, res) => {
+    if (err) {
+      console.log(err);
+    } else {
+      res.send("insert complete");
+    }
+  });
+};
+
+const removeFavoriteMovie = async (req, res) => {
+  const userId = req.body.userId;
+  const favoriteMovie = req.body.favoriteMovie;
+  await pool.query(queries.removeUser, [favoriteMovie, userId], (err, res) => {
+    if (err) {
+      console.log(err);
+    } else {
+      res.send("remove complete");
+    }
+  });
+};
 
 module.exports = {
-  getUsers,
+  getUser,
+  getUserById,
+  getFavoriteMovie,
+  addNewUser,
+  removeUser,
+  addFavoriteMovie,
+  removeFavoriteMovie,
 };
