@@ -19,6 +19,7 @@ SET favorite_movie = array_remove(favorite_movie, $1)
 WHERE userId = $2;
 `;
 
+const getLogin =`SELECT * FROM users WHERE username = $1 AND password = $2`  ;
 
 module.exports = {
   getUser,
@@ -28,4 +29,5 @@ module.exports = {
   removeFavoriteMovie,
   addNewUser,
   removeUser,
+  getLogin,
 };

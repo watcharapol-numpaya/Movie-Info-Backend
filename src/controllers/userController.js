@@ -36,7 +36,6 @@ const getFavoriteMovie = async (req, res) => {
 };
 
 const addNewUser = async (req, res) => {
- 
   const username = req.body.username;
   const password = req.body.password;
   await pool.query(queries.addNewUser, [username, password], (err, results) => {
@@ -63,13 +62,17 @@ const removeUser = async (req, res) => {
 const addFavoriteMovie = async (req, res) => {
   const userId = req.body.userId;
   const favorite_movie = req.body.favorite_movie;
-  await pool.query(queries.addFavoriteMovie, [favorite_movie, userId], (err, results) => {
-    if (err) {
-      console.log(err);
-    } else {
-      res.send("insert complete");
+  await pool.query(
+    queries.addFavoriteMovie,
+    [favorite_movie, userId],
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      } else {
+        res.send("insert complete");
+      }
     }
-  });
+  );
 };
 
 const removeFavoriteMovie = async (req, res) => {
@@ -95,19 +98,18 @@ const removeFavoriteMovie = async (req, res) => {
 
  
 const getLogin = async (req, res) => {
- 
   const username = req.body.username;
   const password = req.body.password;
-  await pool.query(queries.addNewUser, [username, password], (err, results) => {
+  await pool.query(queries.getLogin, [username, password], (err, results) => {
     if (err) {
       console.log(err);
-      console.log(req);
     } else {
-      res.send("Value insert");
+      // res.send("Login Success");
+      res.status(200).send(results.rows);
     }
   });
 };
-
+ 
 
 module.exports = {
   getUser,
@@ -117,4 +119,5 @@ module.exports = {
   removeUser,
   addFavoriteMovie,
   removeFavoriteMovie,
+  getLogin, 
 };
