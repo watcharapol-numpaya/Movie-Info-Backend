@@ -12,16 +12,13 @@ const addFavoriteMovie = `
   WHERE userId = $2
   RETURNING *;
 `;
-const removeFavoriteMovie = `UPDATE users
-SET favorite_movie = (
-    SELECT CASE WHEN array_remove(favorite_movie, $1::int[]) IS NULL
-                THEN favorite_movie
-                ELSE array_remove(favorite_movie, $1::int[])
-           END
-)
-WHERE userId = $2
-RETURNING *
+
+const removeFavoriteMovie = `
+UPDATE users
+SET favorite_movie = array_remove(favorite_movie, $1)
+WHERE userId = $2;
 `;
+
 
 module.exports = {
   getUser,

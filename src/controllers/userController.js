@@ -74,16 +74,26 @@ const addFavoriteMovie = async (req, res) => {
 
 const removeFavoriteMovie = async (req, res) => {
   const userId = req.body.userId;
-  const favoriteMovie = req.body.favoriteMovie;
-  await pool.query(queries.removeFavoriteMovie, [favoriteMovie, userId], (err, results) => {
-    if (err) {
-      console.log(err);
-    } else {
-      res.send("remove complete");
+  const favorite_movie = req.body.favorite_movie;
+  const errors = [];
+
+  for (const movieId of favorite_movie) {
+    try {
+      await pool.query(queries.removeFavoriteMovie, [movieId, userId]);
+    } catch (err) {
+      errors.push(err);
     }
-  });
+  }
+
+  if (errors.length > 0) {
+    console.log(errors);
+    res.status(500).send("Error removing favorite movies");
+  } else {
+    res.send("Favorite movies removed successfully");
+  }
 };
 
+ 
 const getLogin = async (req, res) => {
  
   const username = req.body.username;

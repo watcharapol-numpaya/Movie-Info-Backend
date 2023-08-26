@@ -9,7 +9,7 @@ router.get("/:userId/favorite_movie", userController.getFavoriteMovie);
 router.post("/register", userController.addNewUser);
 router.delete("/unregister/:userId", userController.removeUser);
 router.put("/add_favorite_movie", userController.addFavoriteMovie);
-router.get("/remove_favorite_movie", userController.removeFavoriteMovie);
+router.put("/remove_favorite_movie", userController.removeFavoriteMovie);
 router.get("/login", userController.removeFavoriteMovie);
 
 
