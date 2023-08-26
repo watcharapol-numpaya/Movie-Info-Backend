@@ -6,13 +6,11 @@ const userController = require("../controllers/userController");
 router.get("/", userController.getUser);
 router.get("/:userId", userController.getUserById);
 router.get("/:userId/favorite_movie", userController.getFavoriteMovie);
-router.get("/register", userController.addNewUser);
-router.get("/unregister", userController.removeUser);
-router.get("/add_favorite_movie", userController.addFavoriteMovie);
+router.post("/register", userController.addNewUser);
+router.delete("/unregister/:userId", userController.removeUser);
+router.put("/add_favorite_movie", userController.addFavoriteMovie);
 router.get("/remove_favorite_movie", userController.removeFavoriteMovie);
-
-
-
+router.get("/login", userController.removeFavoriteMovie);
 
 
 module.exports = router;

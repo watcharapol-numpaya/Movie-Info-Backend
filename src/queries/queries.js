@@ -1,16 +1,16 @@
 const getUser = "SELECT * FROM users";
 const getUserById = "SELECT * FROM users WHERE userid = $1";
 const getFavoriteMovie = `SELECT favorite_movie FROM users WHERE userId = $1`;
-const addNewUser = `INSERT INTO users (username, password) VALUES('$1', '$2')`;
+const addNewUser = `INSERT INTO users (username, password) VALUES($1, $2);`;
 const removeUser = `DELETE FROM users WHERE userId = $1`;
-const addFavoriteMovie = `UPDATE users
-SET favorite_movie = (
-    SELECT array_agg(DISTINCT m)
-    FROM unnest(array_cat(favorite_movie, $1::int[])) AS m
-    WHERE m NOT IN (SELECT unnest(favorite_movie) FROM users WHERE userId = $2)
-)
-WHERE userId = $2
-RETURNING *
+const addFavoriteMovie = `
+  UPDATE users
+  SET favorite_movie = (
+    SELECT array_agg(DISTINCT movieId)
+    FROM unnest(array_cat(favorite_movie, $1::int[])) AS movieId
+  )
+  WHERE userId = $2
+  RETURNING *;
 `;
 const removeFavoriteMovie = `UPDATE users
 SET favorite_movie = (

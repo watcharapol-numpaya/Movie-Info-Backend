@@ -36,11 +36,13 @@ const getFavoriteMovie = async (req, res) => {
 };
 
 const addNewUser = async (req, res) => {
+ 
   const username = req.body.username;
   const password = req.body.password;
-  await pool.query(queries.addNewUser, [username, password], (err, res) => {
+  await pool.query(queries.addNewUser, [username, password], (err, results) => {
     if (err) {
       console.log(err);
+      console.log(req);
     } else {
       res.send("Value insert");
     }
@@ -48,8 +50,8 @@ const addNewUser = async (req, res) => {
 };
 
 const removeUser = async (req, res) => {
-  const userId = req.body.userId;
-  await pool.query(queries.removeUser, [userId], (err, res) => {
+  const userId = req.params.userId;
+  await pool.query(queries.removeUser, [userId], (err, results) => {
     if (err) {
       console.log(err);
     } else {
@@ -60,8 +62,8 @@ const removeUser = async (req, res) => {
 
 const addFavoriteMovie = async (req, res) => {
   const userId = req.body.userId;
-  const favoriteMovie = req.body.favoriteMovie;
-  await pool.query(queries.removeUser, [favoriteMovie, userId], (err, res) => {
+  const favorite_movie = req.body.favorite_movie;
+  await pool.query(queries.addFavoriteMovie, [favorite_movie, userId], (err, results) => {
     if (err) {
       console.log(err);
     } else {
@@ -73,7 +75,7 @@ const addFavoriteMovie = async (req, res) => {
 const removeFavoriteMovie = async (req, res) => {
   const userId = req.body.userId;
   const favoriteMovie = req.body.favoriteMovie;
-  await pool.query(queries.removeUser, [favoriteMovie, userId], (err, res) => {
+  await pool.query(queries.removeFavoriteMovie, [favoriteMovie, userId], (err, results) => {
     if (err) {
       console.log(err);
     } else {
@@ -81,6 +83,21 @@ const removeFavoriteMovie = async (req, res) => {
     }
   });
 };
+
+const getLogin = async (req, res) => {
+ 
+  const username = req.body.username;
+  const password = req.body.password;
+  await pool.query(queries.addNewUser, [username, password], (err, results) => {
+    if (err) {
+      console.log(err);
+      console.log(req);
+    } else {
+      res.send("Value insert");
+    }
+  });
+};
+
 
 module.exports = {
   getUser,
