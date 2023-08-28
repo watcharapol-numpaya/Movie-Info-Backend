@@ -147,13 +147,19 @@ const getLogin = async (req, res) => {
                   expiresIn: "1h",
                 }
               );
-              res.status(200).json({ token });
+              res.status(200).send({
+                token: token,
+                isSignInPass: true,
+                msg: "Sign In Complete",
+              });
             })
             .catch((err) => {
               console.log(err);
             });
         } else {
-          res.status(401).send("Invalid credentials");
+          res
+            .status(401)
+            .send({ isSignInPass: true, msg: "Invalid credentials" });
         }
       }
     });
