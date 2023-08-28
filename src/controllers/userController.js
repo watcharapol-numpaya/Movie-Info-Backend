@@ -123,51 +123,47 @@ const removeFavoriteMovie = async (req, res) => {
 };
 
 const getLogin = async (req, res) => {
-  const username = req.body.username;
-  const password = req.body.password;
+  const { username, password } = req.body;  
+
   try {
-    await pool.query(queries.getLogin, [username], async (err, results) => {
-      if (err) {
-        res.status(500).send(err);
+    const results = await pool.query(queries.getLogin, [username]); // Use await with pool.query directly
+
+    if (results.rows.length === 1) {
+      const user = results.rows[0];
+
+      const passwordMatch = await bcrypt.compare(password, user.password);
+
+      if (passwordMatch) {
+        // Generate a JWT token
+        const token = jwt.sign(
+          {
+            user_id: user.user_id,
+            username: user.username,
+            favorite_movie: user.favorite_movie,
+          },
+          process.env.TOKEN_KEY,
+          {
+            expiresIn: "1h",
+          }
+        );
+
+        res.status(200).send({
+          token: token,
+          isSignInPass: true,
+          msg: "Sign In Complete",
+        });
       } else {
-        if (results.rows.length === 1) {
-          await bcrypt
-            .compare(password, results.rows[0].password)
-            .then(() => {
-              // Generate a JWT token
-              const user = results.rows[0];
-              const token = jwt.sign(
-                {
-                  user_id: user.user_id,
-                  username: user.username,
-                  favorite_movie: user.favorite_movie,
-                },
-                process.env.TOKEN_KEY,
-                {
-                  expiresIn: "1h",
-                }
-              );
-              res.status(200).send({
-                token: token,
-                isSignInPass: true,
-                msg: "Sign In Complete",
-              });
-            })
-            .catch((err) => {
-              console.log(err);
-            });
-        } else {
-          res
-            .status(401)
-            .send({ isSignInPass: true, msg: "Invalid credentials" });
-        }
+        res.status(401).send({ isSignInPass: false, msg: "Invalid credentials" }); // Update isSignInPass value
       }
-    });
+    } else {
+      res.status(401).send({ isSignInPass: false, msg: "Invalid credentials" });
+    }
   } catch (err) {
     console.error(err);
     res.status(500).send("An error occurred while processing your request.");
   }
 };
+
 
 const getAuthentication = async (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];
