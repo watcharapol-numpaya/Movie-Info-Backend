@@ -50,7 +50,9 @@ const addNewUser = async (req, res) => {
 
   const existingUserCount = userExistsResult.rows[0].count;
   if (existingUserCount > 0) {
-    return res.status(400).send("Username already exists");
+    return res
+      .status(400)
+      .send({ msg: "Username already exists", isRegisterPass: false });
   }
 
   // If user doesn't exist, insert the new user
@@ -64,7 +66,9 @@ const addNewUser = async (req, res) => {
         console.log(err);
         return res.status(500).send("Error registering user");
       } else {
-        res.status(201).send("Register Complete");
+        res
+          .status(201)
+          .send({ msg: "Register Complete", isRegisterPass: true });
       }
     }
   );
