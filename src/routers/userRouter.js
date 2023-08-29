@@ -12,6 +12,6 @@ router.delete("/unregister/:userId", userController.removeUser);
 router.put("/add_favorite_movie", userController.addFavoriteMovie);
 router.put("/remove_favorite_movie", userController.removeFavoriteMovie);
 router.post("/sign-in", userController.getLogin);
-router.post("/authentication",auth,userController.getAuthentication)
+router.post("/authentication",userController.getAuthentication)
 
 module.exports = router;

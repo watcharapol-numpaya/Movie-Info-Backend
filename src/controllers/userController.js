@@ -123,10 +123,10 @@ const removeFavoriteMovie = async (req, res) => {
 };
 
 const getLogin = async (req, res) => {
-  const { username, password } = req.body;  
+  const { username, password } = req.body;
 
   try {
-    const results = await pool.query(queries.getLogin, [username]); // Use await with pool.query directly
+    const results = await pool.query(queries.getLogin, [username]);
 
     if (results.rows.length === 1) {
       const user = results.rows[0];
@@ -153,7 +153,9 @@ const getLogin = async (req, res) => {
           msg: "Sign In Complete",
         });
       } else {
-        res.status(401).send({ isSignInPass: false, msg: "Invalid credentials" }); // Update isSignInPass value
+        res
+          .status(401)
+          .send({ isSignInPass: false, msg: "Invalid credentials" });
       }
     } else {
       res.status(401).send({ isSignInPass: false, msg: "Invalid credentials" });
@@ -164,19 +166,22 @@ const getLogin = async (req, res) => {
   }
 };
 
-
 const getAuthentication = async (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1];
-  if (!token) {
-    return res.status(401).send("Access denied");
-  }
-
-  jwt.verify(token, process.env.TOKEN_KEY, (err, decoded) => {
-    if (err) {
-      return res.status(403).send("Invalid token");
+  try {
+    const token = await req.headers.authorization.split(" ")[1];
+    if (!token) {
+      return res.status(401).send("Access denied");
     }
-    res.status(200).send(decoded);
-  });
+    const decoded = await jwt.verify(token, process.env.TOKEN_KEY);
+    res
+      .status(200)
+      .send({ decoded: decoded, msg: "Authentication Complete", isAuth: true });
+  } catch (error) {
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).send({ msg: "Token expired", isAuth: false });
+    }
+    return res.status(403).send({ msg: "Invalid token", isAuth: false });
+  }
 };
 
 module.exports = {
