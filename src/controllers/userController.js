@@ -169,6 +169,7 @@ const getLogin = async (req, res) => {
 const getAuthentication = async (req, res, next) => {
   try {
     const token = await req.headers.authorization.split(" ")[1];
+    console.log(token)
     if (!token) {
       return res.status(401).send("Access denied");
     }

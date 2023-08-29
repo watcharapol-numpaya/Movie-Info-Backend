@@ -11,8 +11,9 @@ const verifyToken = (req, res, next) => {
       return res.status(403).send("Invalid token");
     }
     req.userId = decoded.userId;
+    //do next function
     next();
   });
 };
 
-module.exports  = verifyToken;
+module.exports = verifyToken;
