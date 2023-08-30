@@ -22,7 +22,7 @@ WHERE user_id = $2;
 const getLogin = `SELECT * FROM users WHERE username = $1`;
 const getCheckUserExist =
   "SELECT COUNT(*) AS count FROM users WHERE username = $1";
-
+const getRefresh = `SELECT * FROM users WHERE username = $1 AND user_id = $2`;
 
 module.exports = {
   getUser,
@@ -34,4 +34,5 @@ module.exports = {
   removeUser,
   getLogin,
   getCheckUserExist,
+  getRefresh,
 };

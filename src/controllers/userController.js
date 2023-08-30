@@ -1,6 +1,10 @@
 require("dotenv").config();
 const pool = require("../../db");
 const queries = require("../queries/queries");
+const {
+  jwtAccessTokenGenerate,
+  jwtRefreshTokenGenerate,
+} = require("../services/jwtUtils");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
@@ -135,20 +139,24 @@ const getLogin = async (req, res) => {
 
       if (passwordMatch) {
         // Generate a JWT token
-        const token = jwt.sign(
-          {
-            user_id: user.user_id,
-            username: user.username,
-            favorite_movie: user.favorite_movie,
-          },
-          process.env.TOKEN_KEY,
-          {
-            expiresIn: "1h",
-          }
-        );
+        const access_token = jwtAccessTokenGenerate(user);
+        const refresh_token = jwtRefreshTokenGenerate(user);
+
+        // const token = jwt.sign(
+        //   {
+        //     user_id: user.user_id,
+        //     username: user.username,
+        //     favorite_movie: user.favorite_movie,
+        //   },
+        //   process.env.access_token,
+        //   {
+        //     expiresIn: "1h",
+        //   }
+        // );
 
         res.status(200).send({
-          token: token,
+          access_token: access_token,
+          refresh_token: refresh_token,
           isSignInPass: true,
           msg: "Sign In Complete",
         });
@@ -166,22 +174,50 @@ const getLogin = async (req, res) => {
   }
 };
 
-const getAuthentication = async (req, res, next) => {
+const getAuthentication = async (req, res) => {
+  res.status(200).send({ msg: "Authentication Complete", isAuth: true });
+ 
+  // try {
+  //   const token = await req.headers.authorization.split(" ")[1];
+  //   console.log(token);
+  //   if (!token) {
+  //     return res.status(401).send("Access denied");
+  //   }
+  //   const decoded = await jwt.verify(token, process.env.TOKEN_KEY);
+  //   res.status(200).send({ decoded: decoded, msg: "Authentication Complete", isAuth: true });
+
+  // } catch (error) {
+  //   if (error.name === "TokenExpiredError") {
+  //     return res.status(401).send({ msg: "Token expired", isAuth: false });
+  //   }
+  //   return res.status(403).send({ msg: "Invalid token", isAuth: false });
+  // }
+};
+
+const getRefreshToken = async (req, res) => {
+  const user_id = req.user_id;
+  const username = req.username;
+
   try {
-    const token = await req.headers.authorization.split(" ")[1];
-    console.log(token)
-    if (!token) {
-      return res.status(401).send("Access denied");
+    const results = await pool.query(queries.getRefresh, [username, user_id]);
+
+    if (results.rows.length === 1) {
+      const user = results.rows[0];
+      const access_token = jwtAccessTokenGenerate(user);
+      const refresh_token = jwtRefreshTokenGenerate(user);
+
+      res.status(200).send({
+        access_token: access_token,
+        refresh_token: refresh_token,
+        isSignInPass: true,
+        msg: "token refresh complete Complete",
+      });
+
+    } else {
+      res.status(401).send({ isSignInPass: false, msg: "Invalid credentials" });
     }
-    const decoded = await jwt.verify(token, process.env.TOKEN_KEY);
-    res
-      .status(200)
-      .send({ decoded: decoded, msg: "Authentication Complete", isAuth: true });
-  } catch (error) {
-    if (error.name === "TokenExpiredError") {
-      return res.status(401).send({ msg: "Token expired", isAuth: false });
-    }
-    return res.status(403).send({ msg: "Invalid token", isAuth: false });
+  } catch (err) {
+    res.status(500).send("An error occurred while processing your request.");
   }
 };
 
@@ -195,4 +231,5 @@ module.exports = {
   removeFavoriteMovie,
   getLogin,
   getAuthentication,
+  getRefreshToken,
 };

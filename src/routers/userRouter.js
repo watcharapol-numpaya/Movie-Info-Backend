@@ -15,6 +15,7 @@ router.post("/sign-in", userController.getLogin);
 
 
 // router.post("/authentication" ,auth )
-router.post("/authentication" ,auth,userController.getAuthentication)
+router.post("/authentication" ,auth.verifyAccessToken,userController.getAuthentication)
+router.post("/refresh_token" ,auth.verifyRefreshToken,userController.getRefreshToken)
 
 module.exports = router;
