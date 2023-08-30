@@ -9,8 +9,8 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
 
-const getUser = async (req, res) => {
-  await pool.query(queries.getUser, (err, results) => {
+const getAllUser = async (req, res) => {
+  await pool.query(queries.getAllUser, (err, results) => {
     if (err) {
       console.log(err);
     } else {
@@ -134,25 +134,16 @@ const getLogin = async (req, res) => {
 
     if (results.rows.length === 1) {
       const user = results.rows[0];
-
       const passwordMatch = await bcrypt.compare(password, user.password);
 
       if (passwordMatch) {
         // Generate a JWT token
         const access_token = jwtAccessTokenGenerate(user);
         const refresh_token = jwtRefreshTokenGenerate(user);
-
-        // const token = jwt.sign(
-        //   {
-        //     user_id: user.user_id,
-        //     username: user.username,
-        //     favorite_movie: user.favorite_movie,
-        //   },
-        //   process.env.access_token,
-        //   {
-        //     expiresIn: "1h",
-        //   }
-        // );
+        await pool.query(queries.addRefreshToken, [
+          refresh_token,
+          user.user_id,
+        ]);
 
         res.status(200).send({
           access_token: access_token,
@@ -176,7 +167,7 @@ const getLogin = async (req, res) => {
 
 const getAuthentication = async (req, res) => {
   res.status(200).send({ msg: "Authentication Complete", isAuth: true });
- 
+
   // try {
   //   const token = await req.headers.authorization.split(" ")[1];
   //   console.log(token);
@@ -197,14 +188,26 @@ const getAuthentication = async (req, res) => {
 const getRefreshToken = async (req, res) => {
   const user_id = req.user_id;
   const username = req.username;
+  const old_refresh_token = req.token;
 
   try {
-    const results = await pool.query(queries.getRefresh, [username, user_id]);
+    const results = await pool.query(queries.getUserByIdAndUsername, [
+      username,
+      user_id,
+    ]);
 
     if (results.rows.length === 1) {
       const user = results.rows[0];
+
+      //Check is old refresh token if yes will reject.
+      if (old_refresh_token !== user.refresh_token) {
+        return res.sendStatus(401);
+      }
+
       const access_token = jwtAccessTokenGenerate(user);
       const refresh_token = jwtRefreshTokenGenerate(user);
+
+      await pool.query(queries.addRefreshToken, [refresh_token, user.user_id]);
 
       res.status(200).send({
         access_token: access_token,
@@ -212,7 +215,6 @@ const getRefreshToken = async (req, res) => {
         isSignInPass: true,
         msg: "token refresh complete Complete",
       });
-
     } else {
       res.status(401).send({ isSignInPass: false, msg: "Invalid credentials" });
     }
@@ -222,7 +224,7 @@ const getRefreshToken = async (req, res) => {
 };
 
 module.exports = {
-  getUser,
+  getAllUser,
   getUserById,
   getFavoriteMovie,
   addNewUser,

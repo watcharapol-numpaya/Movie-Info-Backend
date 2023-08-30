@@ -1,4 +1,4 @@
-const getUser = "SELECT * FROM users";
+const getAllUser = "SELECT * FROM users";
 const getUserById = "SELECT * FROM users WHERE user_id = $1";
 const getFavoriteMovie = `SELECT favorite_movie FROM users WHERE user_id = $1`;
 const addNewUser = `INSERT INTO users (username, password) VALUES($1, $2);`;
@@ -22,10 +22,11 @@ WHERE user_id = $2;
 const getLogin = `SELECT * FROM users WHERE username = $1`;
 const getCheckUserExist =
   "SELECT COUNT(*) AS count FROM users WHERE username = $1";
-const getRefresh = `SELECT * FROM users WHERE username = $1 AND user_id = $2`;
-
+const getUserByIdAndUsername = `SELECT * FROM users WHERE username = $1 AND user_id = $2`;
+const addRefreshToken = `UPDATE users SET refresh_token = $1 WHERE user_id = $2;`;
+ 
 module.exports = {
-  getUser,
+  getAllUser,
   getUserById,
   getFavoriteMovie,
   addFavoriteMovie,
@@ -34,5 +35,7 @@ module.exports = {
   removeUser,
   getLogin,
   getCheckUserExist,
-  getRefresh,
+  getUserByIdAndUsername,
+  addRefreshToken,
+ 
 };

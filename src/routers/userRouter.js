@@ -4,7 +4,7 @@ const uuid = require("uuid");
 const userController = require("../controllers/userController");
 const auth = require('../middleware/auth')
 
-router.get("/", userController.getUser);
+router.get("/", userController.getAllUser);
 router.get("/:userId", userController.getUserById);
 router.get("/:userId/favorite_movie", userController.getFavoriteMovie);
 router.post("/register", userController.addNewUser);
