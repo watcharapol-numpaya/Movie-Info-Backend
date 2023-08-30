@@ -148,16 +148,16 @@ const getLogin = async (req, res) => {
         res.status(200).send({
           access_token: access_token,
           refresh_token: refresh_token,
-          isSignInPass: true,
+          is_sign_in_pass: true,
           msg: "Sign In Complete",
         });
       } else {
         res
           .status(401)
-          .send({ isSignInPass: false, msg: "Invalid credentials" });
+          .send({ is_sign_in_pass: false, msg: "Invalid credentials" });
       }
     } else {
-      res.status(401).send({ isSignInPass: false, msg: "Invalid credentials" });
+      res.status(401).send({ is_sign_in_pass: false, msg: "Invalid credentials" });
     }
   } catch (err) {
     console.error(err);
@@ -166,7 +166,7 @@ const getLogin = async (req, res) => {
 };
 
 const getAuthentication = async (req, res) => {
-  res.status(200).send({ msg: "Authentication Complete", isAuth: true });
+  res.status(200).send({ msg: "Authentication Complete", is_auth: true });
 
   // try {
   //   const token = await req.headers.authorization.split(" ")[1];
@@ -175,13 +175,13 @@ const getAuthentication = async (req, res) => {
   //     return res.status(401).send("Access denied");
   //   }
   //   const decoded = await jwt.verify(token, process.env.TOKEN_KEY);
-  //   res.status(200).send({ decoded: decoded, msg: "Authentication Complete", isAuth: true });
+  //   res.status(200).send({ decoded: decoded, msg: "Authentication Complete", is_auth: true });
 
   // } catch (error) {
   //   if (error.name === "TokenExpiredError") {
-  //     return res.status(401).send({ msg: "Token expired", isAuth: false });
+  //     return res.status(401).send({ msg: "Token expired", is_auth: false });
   //   }
-  //   return res.status(403).send({ msg: "Invalid token", isAuth: false });
+  //   return res.status(403).send({ msg: "Invalid token", is_auth: false });
   // }
 };
 
@@ -212,11 +212,11 @@ const getRefreshToken = async (req, res) => {
       res.status(200).send({
         access_token: access_token,
         refresh_token: refresh_token,
-        isSignInPass: true,
+        is_sign_in_pass: true,
         msg: "token refresh complete Complete",
       });
     } else {
-      res.status(401).send({ isSignInPass: false, msg: "Invalid credentials" });
+      res.status(401).send({ is_sign_in_pass: false, msg: "Invalid credentials" });
     }
   } catch (err) {
     res.status(500).send("An error occurred while processing your request.");
