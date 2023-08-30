@@ -212,11 +212,10 @@ const getRefreshToken = async (req, res) => {
       res.status(200).send({
         access_token: access_token,
         refresh_token: refresh_token,
-        is_sign_in_pass: true,
         msg: "token refresh complete Complete",
       });
     } else {
-      res.status(401).send({ is_sign_in_pass: false, msg: "Invalid credentials" });
+      res.status(401).send({ msg: "Invalid credentials" });
     }
   } catch (err) {
     res.status(500).send("An error occurred while processing your request.");
