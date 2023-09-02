@@ -6,8 +6,8 @@ const auth = require('../middleware/auth')
 
 //get request 
 router.get("/", userController.getAllUser);
-router.get("/:userId", userController.getUserById);
-router.get("/:userId/favorite_movie", userController.getFavoriteMovie);
+router.get("/:user_id", userController.getUserById);
+router.get("/:user_id/favorite_movie", userController.getFavoriteMovie);
  
 //post request
 router.post("/register", userController.addNewUser);
@@ -20,7 +20,7 @@ router.put("/add_favorite_movie", userController.addFavoriteMovie);
 router.put("/remove_favorite_movie", userController.removeFavoriteMovie);
 
 //delete request 
-router.delete("/unregister/:userId", userController.removeUser);
+router.delete("/unregister/:user_id", userController.removeUser);
  
  
 module.exports = router;
