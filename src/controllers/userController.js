@@ -157,9 +157,7 @@ const getLogin = async (req, res) => {
           .send({ is_sign_in_pass: false, msg: "Invalid credentials" });
       }
     } else {
-      res
-        .status(401)
-        .send({ is_sign_in_pass: false, msg: "Invalid credentials" });
+      res.status(401).send({ is_sign_in_pass: false, msg: "Invalid credentials" });
     }
   } catch (err) {
     console.error(err);
