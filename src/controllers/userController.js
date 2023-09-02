@@ -79,14 +79,14 @@ const addNewUser = async (req, res) => {
 };
 
 const removeUser = async (req, res) => {
-  const user_id = req.params.user_id;
-  await pool.query(queries.removeUser, [user_id], (err, results) => {
-    if (err) {
-      console.log(err);
-    } else {
-      res.send("remove complete");
-    }
-  });
+  try {
+    const user_id = req.params.user_id;
+    await pool.query(queries.removeUser, [user_id]);
+    res.send("Remove complete");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("An error occurred while removing the user");
+  }
 };
 
 const addFavoriteMovie = async (req, res) => {
