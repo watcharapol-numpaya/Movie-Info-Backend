@@ -38,7 +38,7 @@ const getFavoriteMovie = async (req, res) => {
     if (err) {
       console.log(err);
     } else {
-      res.status(200).send(results.rows);
+      res.status(200).send(results.rows[0]);
     }
   });
 };
