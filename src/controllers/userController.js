@@ -33,7 +33,7 @@ const getUserById = async (req, res) => {
 };
 
 const getFavoriteMovie = async (req, res) => {
-  const user_id = req.params.user_id;
+  const user_id = req.body.user_id;
   await pool.query(queries.getFavoriteMovie, [user_id], (err, results) => {
     if (err) {
       console.log(err);
