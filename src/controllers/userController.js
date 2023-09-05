@@ -10,73 +10,77 @@ const bcrypt = require("bcrypt");
 const saltRounds = 10;
 
 const getAllUser = async (req, res) => {
-  await pool.query(queries.getAllUser, (err, results) => {
-    if (err) {
-      console.log(err);
-    } else {
-      //   res.send(results);
-      res.status(200).send(results.rows);
-    }
-  });
+  try {
+    const results = await pool.query(queries.getAllUser);
+    res.status(200).json(results.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: 'An error occurred while fetching users.' });
+  }
 };
+
 
 const getUserById = async (req, res) => {
-  const user_id = req.params.user_id;
-  //   res.send(user_id);
-  await pool.query(queries.getUserById, [user_id], (err, results) => {
-    if (err) {
-      console.log(err);
+  try {
+    const user_id = req.params.user_id;
+    const results = await pool.query(queries.getUserById, [user_id]);
+    if (results.rows.length === 0) {
+      res.status(404).json({ msg: 'User not found' });
     } else {
-      res.status(200).send(results.rows);
+      res.status(200).json(results.rows[0]);
     }
-  });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: 'An error occurred while fetching the user.' });
+  }
 };
 
+
 const getFavoriteMovie = async (req, res) => {
-  const user_id = req.body.user_id;
-  await pool.query(queries.getFavoriteMovie, [user_id], (err, results) => {
-    if (err) {
-      console.log(err);
+  try {
+    const { user_id } = req.body;
+    const results = await pool.query(queries.getFavoriteMovie, [user_id]);
+    
+    if (results.rows.length === 0) {
+      res.status(404).json({ msg: 'Favorite movie not found for this user' });
     } else {
-      res.status(200).send(results.rows[0]);
+      res.status(200).json(results.rows[0]);
     }
-  });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: 'An error occurred while fetching the favorite movie.' });
+  }
 };
+
 
 const addNewUser = async (req, res) => {
   const { username, password } = req.body;
-  const encryptPassword = await bcrypt.hash(password, saltRounds);
+  
+  try {
+    // Check if the user already exists in the database
+    const userExistsResult = await pool.query(queries.getCheckUserExist, [
+      username,
+    ]);
 
-  // Check if the user already exists in the database
-  const userExistsResult = await pool.query(queries.getCheckUserExist, [
-    username,
-  ]);
-
-  const existingUserCount = userExistsResult.rows[0].count;
-  if (existingUserCount > 0) {
-    return res
-      .status(400)
-      .send({ msg: "Username already exists", isRegisterPass: false });
-  }
-
-  // If user doesn't exist, insert the new user
-  const insertUserQuery =
-    "INSERT INTO users (username, password) VALUES($1, $2)";
-  await pool.query(
-    insertUserQuery,
-    [username, encryptPassword],
-    (err, results) => {
-      if (err) {
-        console.log(err);
-        return res.status(500).send("Error registering user");
-      } else {
-        res
-          .status(201)
-          .send({ msg: "Register Complete", isRegisterPass: true });
-      }
+    const existingUserCount = userExistsResult.rows[0].count;
+    if (existingUserCount > 0) {
+      return res.status(400).json({ msg: "Username already exists", isRegisterPass: false });
     }
-  );
+
+    const encryptPassword = await bcrypt.hash(password, saltRounds);
+
+    // Insert the new user into the database
+    await pool.query(queries.addNewUser, [username, encryptPassword]);
+
+    res.status(201).json({ msg: "Registration successful", isRegisterPass: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "An error occurred while registering the user" });
+  }
 };
+
+
+
 
 const removeUser = async (req, res) => {
   try {
@@ -85,25 +89,22 @@ const removeUser = async (req, res) => {
     res.send("Remove complete");
   } catch (error) {
     console.error(error);
-    res.status(500).send("An error occurred while removing the user");
+    res.status(500).send({msg:"An error occurred while removing the user"});
   }
 };
 
 const addFavoriteMovie = async (req, res) => {
-  const user_id = req.body.user_id;
-  const favorite_movie = req.body.favorite_movie;
-  await pool.query(
-    queries.addFavoriteMovie,
-    [favorite_movie, user_id],
-    (err, results) => {
-      if (err) {
-        console.log(err);
-      } else {
-        res.status(200).send("insert complete");
-      }
-    }
-  );
+  const { user_id, favorite_movie } = req.body;
+  try {
+    // Insert the favorite movie into the database
+    await pool.query(queries.addFavoriteMovie, [favorite_movie, user_id]);
+    res.status(201).json({ msg: "Favorite movie added successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "An error occurred while adding the favorite movie" });
+  }
 };
+
 
 const removeFavoriteMovie = async (req, res) => {
   const user_id = req.body.user_id;
@@ -120,9 +121,9 @@ const removeFavoriteMovie = async (req, res) => {
 
   if (errors.length > 0) {
     console.log(errors);
-    res.status(500).send("Error removing favorite movies");
+    res.status(500).send({msg:"Error removing favorite movies"});
   } else {
-    res.send("Favorite movies removed successfully");
+    res.send({msg:"Favorite movies removed successfully"});
   }
 };
 
@@ -218,7 +219,7 @@ const getRefreshToken = async (req, res) => {
       res.status(401).send({ msg: "Invalid credentials" });
     }
   } catch (err) {
-    res.status(500).send("An error occurred while processing your request.");
+    res.status(500).send({msg:"An error occurred while processing your request."});
   }
 };
 
