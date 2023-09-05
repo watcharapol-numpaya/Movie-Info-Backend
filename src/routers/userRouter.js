@@ -15,8 +15,8 @@ router.post("/authentication",auth.verifyAccessToken,userController.getAuthentic
 router.post("/refresh_token" ,auth.verifyRefreshToken,userController.getRefreshToken)
 router.post("/favorite_movie",auth.verifyAccessToken, userController.getFavoriteMovie); 
 //put request
-router.put("/add_favorite_movie", userController.addFavoriteMovie);
-router.put("/remove_favorite_movie", userController.removeFavoriteMovie);
+router.put("/add_favorite_movie",auth.verifyAccessToken, userController.addFavoriteMovie);
+router.put("/remove_favorite_movie",auth.verifyAccessToken, userController.removeFavoriteMovie);
 
 //delete request 
 router.delete("/unregister/:user_id", userController.removeUser);
