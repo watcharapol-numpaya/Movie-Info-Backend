@@ -13,16 +13,9 @@ app.use(express.urlencoded({ extended: false })); //อาจจะไม่ต�
 
 //{ origin: 'http://localhost:3000' }
 
-// app.get("/", (req, res) => {
-//   res.send("hello world");
-// });
 
 app.use("/api/v1/user", userRouter);
 
-// app.get('/', (req, res) => {
-//  res.send("HI HI HI")
-// });
-
 app.listen(port, () => {
-  // console.log(`Server is running on port ${port}`);
+  console.log(`Server is running on port ${port}`);
 });
